@@ -1,5 +1,12 @@
 extends CharacterBody2D
 
+var enermy_inattack_range = false
+var enermy_attack_cooldown = true
+
+var health = 100
+var player_alive = true
+
+
 const speed = 100
 var current_dir = "none"
 
@@ -8,6 +15,13 @@ func _ready():
 	
 func _physics_process( delta ):
 	player_movent( delta )
+	enemy_attack()
+	
+	if health <= 0:
+		player_alive = false
+		health = 0
+		print("player dead~")
+		self.queue_free()
 	
 func player_movent( delta ):
 	
@@ -70,3 +84,28 @@ func play_anim(movement):
 		
 		#dddd
 	
+func player():
+	pass
+
+func _on_player_hitbox_body_entered(body):
+	if body.has_method("enemy"):
+		enermy_inattack_range = true
+
+
+func _on_player_hitbox_body_exited(body):
+	if body.has_method("enemy"):
+		enermy_inattack_range = false
+		
+func enemy_attack():
+	if enermy_inattack_range and enermy_attack_cooldown == true:
+		health = health - 20
+		enermy_attack_cooldown = false
+		$attack_cooldown.start()
+		print(health)
+	
+		
+	
+
+
+func _on_attack_cooldown_timeout():
+	enermy_attack_cooldown = true
